@@ -380,6 +380,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   networkDiscovery: {fileID: 690687572}
+  useNetworkDiscovery: 0
+  serverAddress: 128.237.161.41
+  serverPort: 1492
 --- !u!1 &800000621
 GameObject:
   m_ObjectHideFlags: 0

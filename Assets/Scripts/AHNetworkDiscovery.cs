@@ -13,7 +13,6 @@ public class AHNetworkDiscovery : NetworkDiscovery {
 	public override void OnReceivedBroadcast (string fromAddress, string data)
 	{
 		AHServerInfo serverInfo = new AHServerInfo();
-		char[] trimChars = {':', 'f'};
 		serverInfo.serverAddress = fromAddress;
 		int.TryParse(data, out serverInfo.serverPort);
 		Debug.Log("fromAddress: " + serverInfo.serverAddress + ", data: " + data);

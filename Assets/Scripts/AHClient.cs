@@ -7,6 +7,9 @@ using System.Collections;
 public class AHClient : MonoBehaviour {
 
 	public NetworkDiscovery networkDiscovery;
+	public bool useNetworkDiscovery = true;
+	public string serverAddress;
+	public int serverPort;
 	NetworkClient client = null;
 
 	// Use this for initialization
@@ -17,10 +20,16 @@ public class AHClient : MonoBehaviour {
 		}
 		else
 		{
-			networkDiscovery.StartAsClient();
 			clientSetup();
+			if (useNetworkDiscovery)
+			{
+				networkDiscovery.StartAsClient();
+			}
+			else
+			{
+				client.Connect(serverAddress, serverPort);
+			}
 		}
-	
 	}
 	
 	// Update is called once per frame
@@ -56,7 +65,7 @@ public class AHClient : MonoBehaviour {
 		Debug.Log("Connected to server.");
 	}
 
-	public void OnError(NetworkMessage netMsg) {
+	void OnError(NetworkMessage netMsg) {
 		ErrorMessage errorMsg = netMsg.ReadMessage<ErrorMessage>();
 		Debug.Log("Error connecting with code " + errorMsg.errorCode);
 	}
