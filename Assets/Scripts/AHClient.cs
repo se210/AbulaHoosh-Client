@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Networking.NetworkSystem;
+using UnityEngine.UI;
 using System;
 using System.Collections;
 
@@ -10,7 +11,9 @@ public class AHClient : MonoBehaviour {
 	public bool useNetworkDiscovery = true;
 	public string serverAddress;
 	public int serverPort;
+	public Image statusPanel;
 	NetworkClient client = null;
+	int playerNum = -1;
 
 	// Use this for initialization
 	void Start () {
@@ -57,6 +60,23 @@ public class AHClient : MonoBehaviour {
 		client = new NetworkClient();
 		client.RegisterHandler(MsgType.Connect, OnConnect);
 		client.RegisterHandler(MsgType.Error, OnError);
+		client.RegisterHandler(AHMsg.ConnectMessage, OnConnectMsg);
+	}
+
+	void updateStatusPanel()
+	{
+		switch (playerNum)
+		{
+		case 0:
+			statusPanel.color = Color.red;
+			break;
+		case 1:
+			statusPanel.color = Color.blue;
+			break;
+		default:
+			statusPanel.color = Color.black;
+			break;
+		}
 	}
 
 	// ---------------- msg handlers ------------------------
@@ -68,6 +88,13 @@ public class AHClient : MonoBehaviour {
 	void OnError(NetworkMessage netMsg) {
 		ErrorMessage errorMsg = netMsg.ReadMessage<ErrorMessage>();
 		Debug.Log("Error connecting with code " + errorMsg.errorCode);
+	}
+
+	void OnConnectMsg(NetworkMessage netMsg)
+	{
+		AHConnectMessage msg = netMsg.ReadMessage<AHConnectMessage>();
+		playerNum = msg.playerNum;
+		updateStatusPanel();
 	}
 
 }
