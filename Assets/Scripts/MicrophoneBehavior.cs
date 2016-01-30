@@ -6,7 +6,7 @@ public class MicrophoneBehavior : MonoBehaviour {
 	AudioSource aud;
 	int minFrequency;
 	int maxFrequency;
-	string filePath;
+	public string filePath;
 
 	// Use this for initialization
 	void Start () {

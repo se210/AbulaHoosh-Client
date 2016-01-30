@@ -4,6 +4,7 @@ using UnityEngine.Networking.NetworkSystem;
 using UnityEngine.UI;
 using System;
 using System.Collections;
+using System.IO;
 
 public class AHClient : MonoBehaviour {
 
@@ -12,6 +13,7 @@ public class AHClient : MonoBehaviour {
 	public string serverAddress;
 	public int serverPort;
 	public Image statusPanel;
+	public MicrophoneBehavior microphoneBehavior;
 	NetworkClient client = null;
 	int playerNum = -1;
 
@@ -52,6 +54,41 @@ public class AHClient : MonoBehaviour {
 		{
 			networkDiscovery.StopBroadcast();
 			client.Connect(serverInfo.serverAddress, serverInfo.serverPort);
+		}
+	}
+
+	public void sendVoiceToServer()
+	{
+		if (client.isConnected)
+		{
+			Byte[] bytes = File.ReadAllBytes(microphoneBehavior.filePath);
+
+			// notify the server with file information
+			AHVoiceFileInfoMessage fileInfoMsg = new AHVoiceFileInfoMessage();
+			fileInfoMsg.playerNum = playerNum;
+			fileInfoMsg.fileSize = bytes.Length;
+
+			client.Send(AHMsg.VoiceFileInfoMessage, fileInfoMsg);
+
+			// break up the file in 1024 byte chunks and send
+			for (int i=0; i < bytes.Length; i += 1024)
+			{
+				AHVoiceFileMessage voiceMsg = new AHVoiceFileMessage();
+				voiceMsg.playerNum = playerNum;
+				voiceMsg.index = i;
+				int size = i + 1024 > bytes.Length ? bytes.Length - i : 1024;
+				voiceMsg.bytes = new Byte[size];
+				Array.Copy(bytes, i, voiceMsg.bytes, 0, size);
+
+				client.Send(AHMsg.VoiceFileMessage, voiceMsg);
+				client.connection.FlushChannels();
+			}
+
+			// notify the server that file transfer has finished
+			AHVoiceFileCompleteMessage fileCompleteMsg = new AHVoiceFileCompleteMessage();
+			fileCompleteMsg.playerNum = playerNum;
+
+			client.Send(AHMsg.VoiceFileCompleteMessage, fileCompleteMsg);
 		}
 	}
 
