@@ -6,10 +6,12 @@ public class MicrophoneBehavior : MonoBehaviour {
 	AudioSource aud;
 	int minFrequency;
 	int maxFrequency;
+	string filePath;
 
 	// Use this for initialization
 	void Start () {
 		aud = gameObject.AddComponent<AudioSource>();
+		filePath = Application.persistentDataPath + "/voice.wav";
 		foreach (string device in Microphone.devices) {
 			Debug.Log("Name: " + device);
 		}
@@ -33,10 +35,15 @@ public class MicrophoneBehavior : MonoBehaviour {
 	public void endRecording()
 	{
 		Microphone.End(null);
+		SavWav.Save(filePath, aud.clip);
 	}
 
 	public void playRecordedSound()
 	{
+//		aud.Play();
+		WWW www = new WWW("file://"+filePath);
+		aud.clip = www.audioClip;
+		while(aud.clip.loadState != AudioDataLoadState.Loaded);
 		aud.Play();
 	}
 }
