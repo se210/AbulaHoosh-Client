@@ -8,6 +8,8 @@ using System.IO;
 
 public class AHClient : MonoBehaviour {
 
+	public static AHClient singleton = null;
+
 	public NetworkDiscovery networkDiscovery;
 	public bool useNetworkDiscovery = true;
 	public string serverAddress;
@@ -16,6 +18,17 @@ public class AHClient : MonoBehaviour {
 	public MicrophoneBehavior microphoneBehavior;
 	NetworkClient client = null;
 	int playerNum = -1;
+
+	void Awake() {
+		if (singleton == null)
+		{
+			singleton = this;
+		}
+		else
+		{
+			Destroy(gameObject);
+		}
+	}
 
 	// Use this for initialization
 	void Start () {
@@ -90,6 +103,18 @@ public class AHClient : MonoBehaviour {
 
 			client.Send(AHMsg.VoiceFileCompleteMessage, fileCompleteMsg);
 		}
+	}
+
+	public void sendShakeRateToServer(float shakeRate, int numShake)
+	{
+		if(!client.isConnected)
+			return;
+		AHShakeMessage shakeMsg = new AHShakeMessage();
+		shakeMsg.playerNum = playerNum;
+		shakeMsg.shakeRate = shakeRate;
+		shakeMsg.numShake = numShake;
+
+		client.Send(AHMsg.ShakeMessage, shakeMsg);
 	}
 
 	void clientSetup()

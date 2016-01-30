@@ -18,6 +18,7 @@ public class ShakeDetector : MonoBehaviour {
 	Vector3 acceleration;
 	Vector3 deltaAcceleration;
 	int shakeCount = 0;
+	int shakeCountPerFrame = 0;
 
 	// Use this for initialization
 	void Start () {
@@ -28,18 +29,26 @@ public class ShakeDetector : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		shakeCountText.text = string.Format("Shake count: {0:D}", shakeCount);
+		float shakeRate = shakeCountPerFrame/Time.deltaTime;
+		Debug.Log(string.Format("Shake rate = {0:F}", shakeRate));
+		AHClient.singleton.sendShakeRateToServer(shakeRate, shakeCountPerFrame);
+		shakeCountPerFrame = 0;
+	}
+
+	void FixedUpdate () {
 		acceleration = Input.acceleration;
 		lowPassValue = Vector3.Lerp(lowPassValue, acceleration, lowPassFilterFactor);
 		deltaAcceleration = acceleration - lowPassValue;
-//		Debug.Log(string.Format("deltaAcceleration.sqrMagnitude = {0}", deltaAcceleration.sqrMagnitude));
+		//		Debug.Log(string.Format("deltaAcceleration.sqrMagnitude = {0}", deltaAcceleration.sqrMagnitude));
 		if (deltaAcceleration.sqrMagnitude >= shakeDetectionThreshold)
 		{
 			// Perform your "shaking actions" here, with suitable guards in the if check above, if necessary to not, to not fire again if they're already being performed.
 			Debug.Log("Shake event detected at time "+Time.time);
 			shakeCount++;
+			shakeCountPerFrame++;
 		}
 
 		accelBox.localPosition = new Vector3(acceleration.x * Screen.width / 2.0f, acceleration.y * Screen.height / 2.0f);
-		shakeCountText.text = string.Format("Shake count: {0:D}", shakeCount);
 	}
 }

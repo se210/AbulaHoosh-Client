@@ -8,6 +8,7 @@ public class AHMsg
 	public const short VoiceFileMessage = 102;
 	public const short VoiceFileInfoMessage = 103;
 	public const short VoiceFileCompleteMessage = 104;
+	public const short ShakeMessage = 105;
 }
 
 public class AHSimpleMessage : MessageBase
@@ -37,4 +38,11 @@ public class AHVoiceFileMessage : MessageBase
 public class AHVoiceFileCompleteMessage : MessageBase
 {
 	public int playerNum;
+}
+
+public class AHShakeMessage : MessageBase
+{
+	public int playerNum;
+	public float shakeRate;
+	public int numShake;
 }
