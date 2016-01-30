@@ -39,13 +39,13 @@ public class AHClient : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (client.isConnected)
-		{
-			Debug.Log("Sending network message to server.");
-			AHSimpleMessage simpleMsg = new AHSimpleMessage();
-			simpleMsg.msg = "hello world";
-			client.Send(AHMsg.SimpleMessage, simpleMsg);
-		}
+//		if (client.isConnected)
+//		{
+//			Debug.Log("Sending network message to server.");
+//			AHSimpleMessage simpleMsg = new AHSimpleMessage();
+//			simpleMsg.msg = "hello world";
+//			client.Send(AHMsg.SimpleMessage, simpleMsg);
+//		}
 	}
 
 	public void connectToServer(AHServerInfo serverInfo)
