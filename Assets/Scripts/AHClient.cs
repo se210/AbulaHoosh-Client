@@ -123,6 +123,7 @@ public class AHClient : MonoBehaviour {
 		client.RegisterHandler(MsgType.Disconnect, OnDisconnect);
 		client.RegisterHandler(MsgType.Error, OnError);
 		client.RegisterHandler(AHMsg.ConnectMessage, OnConnectMsg);
+		client.RegisterHandler(AHMsg.StartRecordingMessage, OnStartRecordingMessage);
 	}
 
 	void updateStatusPanel()
@@ -164,6 +165,12 @@ public class AHClient : MonoBehaviour {
 		AHConnectMessage msg = netMsg.ReadMessage<AHConnectMessage>();
 		playerNum = msg.playerNum;
 		updateStatusPanel();
+	}
+
+	void OnStartRecordingMessage(NetworkMessage netMsg)
+	{
+		Debug.Log("StartRecording");
+		microphoneBehavior.startRecording();
 	}
 
 }

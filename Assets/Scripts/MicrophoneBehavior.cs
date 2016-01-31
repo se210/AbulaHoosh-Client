@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class MicrophoneBehavior : MonoBehaviour {
@@ -7,6 +8,9 @@ public class MicrophoneBehavior : MonoBehaviour {
 	int minFrequency;
 	int maxFrequency;
 	public string filePath;
+	public Slider recordingProgress;
+
+	int recordTime = 3;
 
 	// Use this for initialization
 	void Start () {
@@ -29,7 +33,26 @@ public class MicrophoneBehavior : MonoBehaviour {
 		int recordingFrequency = 44100;
 		if (maxFrequency != 0)
 			recordingFrequency = maxFrequency;
-		aud.clip = Microphone.Start(null, false, 10, recordingFrequency);
+		aud.clip = Microphone.Start(null, false, recordTime, recordingFrequency);
+		StartCoroutine(showRecordingStatus());
+	}
+
+	IEnumerator showRecordingStatus()
+	{
+		recordingProgress.gameObject.SetActive(true);
+		System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+		stopwatch.Start();
+		long elapsedTime = stopwatch.ElapsedMilliseconds;
+		while (elapsedTime < recordTime * 1000)
+		{
+			recordingProgress.value = (float)elapsedTime / (recordTime * 1000);
+			yield return new WaitForEndOfFrame();
+			elapsedTime = stopwatch.ElapsedMilliseconds;
+		}
+		stopwatch.Stop();
+		recordingProgress.gameObject.SetActive(false);
+		endRecording();
+		AHClient.singleton.sendVoiceToServer();
 	}
 
 	public void endRecording()

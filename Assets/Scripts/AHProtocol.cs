@@ -9,6 +9,7 @@ public class AHMsg
 	public const short VoiceFileInfoMessage = 103;
 	public const short VoiceFileCompleteMessage = 104;
 	public const short ShakeMessage = 105;
+	public const short StartRecordingMessage = 106;
 }
 
 public class AHSimpleMessage : MessageBase
