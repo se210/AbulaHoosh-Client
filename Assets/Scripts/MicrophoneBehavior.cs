@@ -8,7 +8,7 @@ public class MicrophoneBehavior : MonoBehaviour {
 	int minFrequency;
 	int maxFrequency;
 	public string filePath;
-	public Slider recordingProgress;
+	public ProgressBar progressBar;
 
 	int recordTime = 3;
 
@@ -39,18 +39,19 @@ public class MicrophoneBehavior : MonoBehaviour {
 
 	IEnumerator showRecordingStatus()
 	{
-		recordingProgress.gameObject.SetActive(true);
+		progressBar.setProgressSliderText("Recording team name...");
+		progressBar.gameObject.SetActive(true);
 		System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
 		stopwatch.Start();
 		long elapsedTime = stopwatch.ElapsedMilliseconds;
 		while (elapsedTime < recordTime * 1000)
 		{
-			recordingProgress.value = (float)elapsedTime / (recordTime * 1000);
+			progressBar.setProgressSliderValue((float)elapsedTime / (recordTime * 1000));
 			yield return new WaitForEndOfFrame();
 			elapsedTime = stopwatch.ElapsedMilliseconds;
 		}
 		stopwatch.Stop();
-		recordingProgress.gameObject.SetActive(false);
+		progressBar.gameObject.SetActive(false);
 		endRecording();
 		AHClient.singleton.sendVoiceToServer();
 	}

@@ -16,6 +16,7 @@ public class AHClient : MonoBehaviour {
 	public int serverPort;
 	public Image statusPanel;
 	public MicrophoneBehavior microphoneBehavior;
+	public ProgressBar progressBar;
 	NetworkClient client = null;
 	int playerNum = -1;
 
@@ -73,35 +74,45 @@ public class AHClient : MonoBehaviour {
 	{
 		if (client.isConnected)
 		{
-			Byte[] bytes = File.ReadAllBytes(microphoneBehavior.filePath);
-
-			// notify the server with file information
-			AHVoiceFileInfoMessage fileInfoMsg = new AHVoiceFileInfoMessage();
-			fileInfoMsg.playerNum = playerNum;
-			fileInfoMsg.fileSize = bytes.Length;
-
-			client.Send(AHMsg.VoiceFileInfoMessage, fileInfoMsg);
-
-			// break up the file in 1024 byte chunks and send
-			for (int i=0; i < bytes.Length; i += 1024)
-			{
-				AHVoiceFileMessage voiceMsg = new AHVoiceFileMessage();
-				voiceMsg.playerNum = playerNum;
-				voiceMsg.index = i;
-				int size = i + 1024 > bytes.Length ? bytes.Length - i : 1024;
-				voiceMsg.bytes = new Byte[size];
-				Array.Copy(bytes, i, voiceMsg.bytes, 0, size);
-
-				client.Send(AHMsg.VoiceFileMessage, voiceMsg);
-				client.connection.FlushChannels();
-			}
-
-			// notify the server that file transfer has finished
-			AHVoiceFileCompleteMessage fileCompleteMsg = new AHVoiceFileCompleteMessage();
-			fileCompleteMsg.playerNum = playerNum;
-
-			client.Send(AHMsg.VoiceFileCompleteMessage, fileCompleteMsg);
+			StartCoroutine(_sendVoiceToServer());
 		}
+	}
+
+	IEnumerator _sendVoiceToServer()
+	{
+		progressBar.setProgressSliderText("Uploading voice to server...");
+		progressBar.gameObject.SetActive(true);
+		Byte[] bytes = File.ReadAllBytes(microphoneBehavior.filePath);
+
+		// notify the server with file information
+		AHVoiceFileInfoMessage fileInfoMsg = new AHVoiceFileInfoMessage();
+		fileInfoMsg.playerNum = playerNum;
+		fileInfoMsg.fileSize = bytes.Length;
+
+		client.Send(AHMsg.VoiceFileInfoMessage, fileInfoMsg);
+
+		// break up the file in 1024 byte chunks and send
+		for (int i=0; i < bytes.Length; i += 1024)
+		{
+			AHVoiceFileMessage voiceMsg = new AHVoiceFileMessage();
+			voiceMsg.playerNum = playerNum;
+			voiceMsg.index = i;
+			int size = i + 1024 > bytes.Length ? bytes.Length - i : 1024;
+			voiceMsg.bytes = new Byte[size];
+			Array.Copy(bytes, i, voiceMsg.bytes, 0, size);
+
+			client.Send(AHMsg.VoiceFileMessage, voiceMsg);
+			client.connection.FlushChannels();
+			progressBar.setProgressSliderValue((float)i / bytes.Length);
+			yield return new WaitForSeconds(0.001f);
+		}
+
+		// notify the server that file transfer has finished
+		AHVoiceFileCompleteMessage fileCompleteMsg = new AHVoiceFileCompleteMessage();
+		fileCompleteMsg.playerNum = playerNum;
+
+		client.Send(AHMsg.VoiceFileCompleteMessage, fileCompleteMsg);
+		progressBar.gameObject.SetActive(false);
 	}
 
 	public void sendShakeRateToServer(float shakeRate, int numShake)
