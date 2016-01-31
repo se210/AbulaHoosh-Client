@@ -30,6 +30,12 @@ public class MicrophoneBehavior : MonoBehaviour {
 
 	public void startRecording()
 	{
+		StartCoroutine(_startRecording());
+	}
+
+	IEnumerator _startRecording()
+	{
+		yield return new WaitForSeconds(0.2f);
 		int recordingFrequency = 44100;
 		if (maxFrequency != 0)
 			recordingFrequency = maxFrequency;
