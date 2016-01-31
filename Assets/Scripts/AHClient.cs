@@ -39,26 +39,25 @@ public class AHClient : MonoBehaviour {
 		else
 		{
 			clientSetup();
-			if (useNetworkDiscovery)
-			{
-				networkDiscovery.StartAsClient();
-			}
-			else
-			{
-				client.Connect(serverAddress, serverPort);
-			}
+			initiateConnection();
 		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
-//		if (client.isConnected)
-//		{
-//			Debug.Log("Sending network message to server.");
-//			AHSimpleMessage simpleMsg = new AHSimpleMessage();
-//			simpleMsg.msg = "hello world";
-//			client.Send(AHMsg.SimpleMessage, simpleMsg);
-//		}
+		updateStatusPanel();
+	}
+
+	void initiateConnection()
+	{
+		if (useNetworkDiscovery)
+		{
+			networkDiscovery.StartAsClient();
+		}
+		else
+		{
+			client.Connect(serverAddress, serverPort);
+		}
 	}
 
 	public void connectToServer(AHServerInfo serverInfo)
@@ -107,7 +106,7 @@ public class AHClient : MonoBehaviour {
 
 	public void sendShakeRateToServer(float shakeRate, int numShake)
 	{
-		if(!client.isConnected)
+		if(!client.isConnected || playerNum < 0)
 			return;
 		AHShakeMessage shakeMsg = new AHShakeMessage();
 		shakeMsg.playerNum = playerNum;
@@ -121,6 +120,7 @@ public class AHClient : MonoBehaviour {
 	{
 		client = new NetworkClient();
 		client.RegisterHandler(MsgType.Connect, OnConnect);
+		client.RegisterHandler(MsgType.Disconnect, OnDisconnect);
 		client.RegisterHandler(MsgType.Error, OnError);
 		client.RegisterHandler(AHMsg.ConnectMessage, OnConnectMsg);
 	}
@@ -145,6 +145,13 @@ public class AHClient : MonoBehaviour {
 	void OnConnect(NetworkMessage netMsg)
 	{
 		Debug.Log("Connected to server.");
+	}
+
+	void OnDisconnect(NetworkMessage netMsg)
+	{
+		Debug.Log("Disconnected from server.");
+		playerNum = -1;
+		initiateConnection();
 	}
 
 	void OnError(NetworkMessage netMsg) {
