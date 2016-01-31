@@ -19,6 +19,7 @@ public class ShakeDetector : MonoBehaviour {
 	Vector3 deltaAcceleration;
 	int shakeCount = 0;
 	int shakeCountPerFrame = 0;
+	int audioIndex = 0;
 
 	// Use this for initialization
 	void Start () {
@@ -47,6 +48,11 @@ public class ShakeDetector : MonoBehaviour {
 			Debug.Log("Shake event detected at time "+Time.time);
 			shakeCount++;
 			shakeCountPerFrame++;
+
+			// Play the maracas sound if shaking
+			AudioSource aud = GetComponents<AudioSource>()[audioIndex];
+			aud.PlayOneShot(aud.clip);
+			audioIndex = (audioIndex + 1) % 3;
 		}
 
 		accelBox.localPosition = new Vector3(acceleration.x * Screen.width / 2.0f, acceleration.y * Screen.height / 2.0f);
