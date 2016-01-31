@@ -149,7 +149,7 @@ public class AHClient : MonoBehaviour {
 			statusPanel.color = Color.blue;
 			break;
 		default:
-			statusPanel.color = Color.black;
+			statusPanel.color = Color.white;
 			break;
 		}
 	}
