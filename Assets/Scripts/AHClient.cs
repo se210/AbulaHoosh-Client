@@ -16,6 +16,7 @@ public class AHClient : MonoBehaviour {
 	public int serverPort;
 	public Image statusPanel;
 	public MicrophoneBehavior microphoneBehavior;
+	public GameObject menuPanel;
 	public ProgressBar progressBar;
 	NetworkClient client = null;
 	int playerNum = -1;
@@ -180,8 +181,7 @@ public class AHClient : MonoBehaviour {
 
 	void OnStartRecordingMessage(NetworkMessage netMsg)
 	{
-		Debug.Log("StartRecording");
-		microphoneBehavior.startRecording();
+		menuPanel.SetActive(true);
 	}
 
 }

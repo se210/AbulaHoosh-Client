@@ -53,7 +53,6 @@ public class MicrophoneBehavior : MonoBehaviour {
 		stopwatch.Stop();
 		progressBar.gameObject.SetActive(false);
 		endRecording();
-		AHClient.singleton.sendVoiceToServer();
 	}
 
 	public void endRecording()
